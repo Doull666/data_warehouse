@@ -58,13 +58,13 @@
 1. CDH 测试包目录：/opt/cloudera/parcels/CDH/lib/hadoop-mapreduce
 2. 执行命令：hadoop jar hadoop-mapreduce-client-jobclient-2.6.0-cdh5.16.2-tests.jar TestDFSIO -write -nrFiles 10 -fileSize 128MB
 3. 测试内容：向 HDFS 集群写 10 个 128M 的文件
-4. 测试结果：![write.png](img_2.png)
+4. 测试结果：![write.png](picture/img_2.png)
 
 ### 读性能测试
 1. CDH 测试包目录：/opt/cloudera/parcels/CDH/lib/hadoop-mapreduce
 2. 执行命令：hadoop jar hadoop-mapreduce-client-jobclient-2.6.0-cdh5.16.2-tests.jar TestDFSIO -read -nrFiles 10 -fileSize 128MB
 3. 测试内容：读取 HDFS 集群 10 个 128M 的文件
-4. 测试结果：![read_4.png](img_4.png)
+4. 测试结果：![read_4.png](picture/img_4.png)
 
 ### 删除测试数据
 1. 执行命令：hadoop jar hadoop-mapreduce-client-jobclient-2.6.0-cdh5.16.2-tests.jar TestDFSIO -clean
@@ -110,7 +110,7 @@
 2. 可以把一些关联表作为事实表，相当于电商行业的 订单表，支付表等； 如 裁判文书关联表、开庭公告关联表等，又由于如 裁判文书维度 只可能在裁判文书关联表中使用到，开庭公告 维度只可能在开庭公告关联表中使用到；故可将这些维度属性退化至相应的事实表中
 
 #### 基于公司业务制定的数据仓库的分层架构
-![img_7.png](img_7.png)
+![img_7.png](picture/img_7.png)
 1. ODS 层（原始数据层）：因公司业务原因，原始数据层可由上游直接给出，无需我们采集接入数据；即 从上游 入库的全量表
 2. DWD 层（明细数据层）：明细数据层主要存储一些事实表，该层对数据进行 清洗、规范化，清洗脏数据，规范 状态不一致的、命名不规范 的数据。为了提高明细数据层的易用性，该层会采取一些维度退化的手法，减少事实表和维度表的关联。如上面所提到的，该层会存储一些维度退化后的 裁判文书关联表、开庭公告关联表等。
 3. DWS 层（轻度汇总层）：会对 DWD 层的数据进行轻度的汇总，汇总成分析某一主题域的服务数据，一般为宽表。如 切分主题为 企业基本信息 ，企业经营信息等；然后企业基本信息中可能又包含 工商信息、联系方式、股东信息、主要成员、工商变更、企业年报、分支机构、参股控股 这八个维度，可将这八个维度数据汇总为一张宽表。
