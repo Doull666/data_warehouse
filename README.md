@@ -7,9 +7,9 @@
 
 ### 集群配置
 
-|节点|单节点磁盘|磁盘总和|单节点内存|内存总和|单节点cpu(物理核)|cpu总和|
-|---|---|---|---|---|---|---|
-|3|36.1G|108.3G|8G|24G|4|12||
+|节点|单节点磁盘|磁盘总和|单节点内存|内存总和| 单节点cpu(物理核) |cpu总和|
+|---|---|---|---|---|-------------|--|
+|3|36.1G|108.3G|8G|24G| 8           |24||
 
 ### 参数调优
 
@@ -23,25 +23,26 @@
 | dfs.datanode.du.reserved | 2.1G                                                     | 设置磁盘容量预留多少的配置，防止hdfs磁盘写满导致系统或其他程序磁盘不足的情况 |
 
 #### yarn 调优
-1. 默认服务器物理核和虚拟核的转换比例是1:2, 4个物理core的服务器也就是拥有8虚拟8vcore ，取80%，即6
-2. 因为该节点还存在其他服务，故需预留内存 10%，即 单节点以供yarn调度内存：8*0.8=6.4G
+1. 默认服务器物理核和虚拟核的转换比例是1:2, 8个物理core的服务器也就是拥有16虚拟vcore ，取80%，即12
+2. 因为该节点还存在其他服务，故需预留内存 10%，即 单节点以供yarn调度内存：8*0.9=7.2 G
 3. cloudera公司做过性能测试, 对于单任务，如果cpu大于等于5之后, cpu利用率反而不是很好（固定经验值），建议设置为4
-4. 综合memory+vcore计算，vcore=4，container=1（6/4）；内存分配：6.4/1=6.4G
+4. 综合memory+vcore计算，vcore=4，container=3（12/4）；内存分配：7.2/3=2.4 G
 5. 在yarn上运行程序时每个task都是在独立的Container中运行的
+6. 服务器物理核查看方式：cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l * grep 'core id' /proc/cpuinfo | sort -u | wc -l
 
 |参数| 调优                                        | 作用    |
 |---|-------------------------------------------|-------|
-|yarn.nodemanager.resource.memory-mb| 6.4G                                      |表示yarn在该节点上可使用的物理内存总量，给服务器预留15%-20%|
-|yarn.nodemanager.resource.cpu-vcores| 6                                         |服务器最多分配给nodemanager使用的虚拟核数|
+|yarn.nodemanager.resource.memory-mb| 7.2G                                      |表示yarn在该节点上可使用的物理内存总量，给服务器预留15%-20%|
+|yarn.nodemanager.resource.cpu-vcores| 12                                        |服务器最多分配给nodemanager使用的虚拟核数|
 |yarn.scheduler.minimum-allocation-vcores| 1                                         |一个container最少占用vcore数|
 |yarn.scheduler.maximum-allocation-vcores| 4                                         |一个container最多占用vcore数|
 |yarn.scheduler.minimum-allocation-mb| 512M                                      |单个任务可申请的最少物理内存|
-|yarn.scheduler.maximum-allocation-mb| 6.4G                                      |单个任务可申请的最多物理内存|
-|mapreduce.map.memory.mb| 6.4G                                      |一个MapTask可使用的资源上限，如果MapTask实际使用的资源量超过该值，则会被强制杀死，其值不要超过yarn.scheduler.maximum-allocation-mb|
-|mapreduce.reduce.memory.mb| 6.4G                                      |一个 ReduceTask 可使用的资源上限。如果 ReduceTask 实际使用的资源量超过该值，则会被强制杀死，其值不要超过yarn.scheduler.maximum-allocation-mb|
+|yarn.scheduler.maximum-allocation-mb| 2.4G                                      |单个任务可申请的最多物理内存|
+|mapreduce.map.memory.mb| 2.4G                                      |一个MapTask可使用的资源上限，如果MapTask实际使用的资源量超过该值，则会被强制杀死，其值不要超过yarn.scheduler.maximum-allocation-mb|
+|mapreduce.reduce.memory.mb| 2.4G                                      |一个 ReduceTask 可使用的资源上限。如果 ReduceTask 实际使用的资源量超过该值，则会被强制杀死，其值不要超过yarn.scheduler.maximum-allocation-mb|
 |mapreduce.map.cpu.vcores| 4                                         |每个 MapTask 可使用的最多 cpu core 数目|
 |mapreduce.reduce.cpu.vcores| 4                                         |每个 ReduceTask 可使用的最多 cpu core 数目|
-|mapreduce.reduce.shuffle.parallelcopies| 10                                         |每个 Reduce 去 Map 中取数据的并行数|
+|mapreduce.reduce.shuffle.parallelcopies| 10                                        |每个 Reduce 去 Map 中取数据的并行数|
 |mapreduce.task.io.sort.mb| 200M                                      |   Shuffle环形缓冲区大小，默认100M;调大会减少环形缓冲区的溢写次数，减少磁盘IO，加快map处理速度 |
 | mapreduce.map.sort.spill.percent | 90%                                       |      环形缓冲区溢写的阈值，默认80% |
 | mapreduce.map.output.compress | true                                      |       MAP输出压缩 |
