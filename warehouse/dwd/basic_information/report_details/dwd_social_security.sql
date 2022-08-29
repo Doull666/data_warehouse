@@ -1,0 +1,76 @@
+--一家企业可能有多条工商变更
+CREATE TABLE IF NOT EXISTS dwd_social_security
+    (
+        `id` STRING COMMENT '序号'                                ,
+        `eid` STRING COMMENT '企业eid'                            ,
+        `name` STRING COMMENT '公司名'                             ,
+        `report_year` STRING COMMENT '年报年份'                     ,
+        `report_name` STRING COMMENT '年报名称'                     ,
+        `report_date` STRING COMMENT '年报日期'                     ,
+        `bq_shengyubx_je` string COMMENT 'bq_shengyubx_je'      ,
+        `dw_je_display` STRING COMMENT '是否展示欠缴金额'               ,
+        `dw_yanglaobx_je` STRING COMMENT '单位参加城镇职工基本养老保险累计欠缴金额' ,
+        `bq_shiyebx_je` STRING COMMENT '参加失业保险本期实际缴费金额'         ,
+        `dw_yiliaobx_je` STRING COMMENT '单位参加职工基本医疗保险累计欠缴金额'    ,
+        `shiyebx_num` string COMMENT '失业保险人数'                   ,
+        `dw_yanglaobx_js` string COMMENT '单位参加城镇职工基本养老保险缴费基数'   ,
+        `dw_gongshangbx_js` STRING COMMENT '单位参加工伤保险缴费基数'       ,
+        `yiliaobx_num` STRING COMMENT '职工基本医疗保险人数'              ,
+        `dw_shengyubx_je` STRING COMMENT '单位参加生育保险累计欠缴金额'       ,
+        `dw_js_display` STRING COMMENT '是否展示单位缴费基数'             ,
+        `dw_shengyubx_js` STRING COMMENT '单位参加生育保险缴费基'          ,
+        `bq_yiliaobx_je` STRING COMMENT '参加职工基本医疗保险本期实际缴费金额'    ,
+        `bq_gongshangbx_je` STRING COMMENT '参加工伤保险本期实际缴费金额'     ,
+        `dw_gongshangbx_je` STRING COMMENT '单位参加工伤保险累计欠缴金额'     ,
+        `shengyubx_num` STRING COMMENT '生育保险人数'                 ,
+        `dw_shiyebx_js` STRING COMMENT '单位参加失业保险缴费基数'           ,
+        `dw_shiyebx_je` STRING COMMENT '单位参加失业保险累计欠缴金额'         ,
+        `bq_je_display` STRING COMMENT '是否展示实际缴费金额'             ,
+        `gongshangbx_num` STRING COMMENT '工伤保险人数'               ,
+        `yanglaobx_num` STRING COMMENT '城镇职工基本养老保险人数'           ,
+        `bq_yanglaobx_je` STRING COMMENT '参加城镇职工基本养老保'          ,
+        `dw_yiliaobx_js` STRING COMMENT '单位参加职工基本医疗保险缴费基数'      ,
+        `currency` STRING COMMENT '币种'                          ,
+        `created_time` bigint COMMENT '创建时间'                    ,
+        `row_update_time` STRING COMMENT '最后更新时间'
+    )
+COMMENT '企业社保信息' STORED
+AS ORC;
+
+insert overwrite table dwd_social_security
+select
+`id`,
+`eid`,
+`name`,
+if(regexp(`report_year`,'^[1|2][0-9]{3}') and substr(`report_year`,1,4) < 2030,`report_year`,'0000') as `report_year`,
+`report_name`,
+`report_date`,
+`bq_shengyubx_je`,
+`dw_je_display`,
+`dw_yanglaobx_je`,
+`bq_shiyebx_je`,
+`dw_yiliaobx_je`,
+`shiyebx_num`,
+`dw_yanglaobx_js`,
+`dw_gongshangbx_js`,
+`yiliaobx_num`,
+`dw_shengyubx_je`,
+`dw_js_display`,
+`dw_shengyubx_js`,
+`bq_yiliaobx_je`,
+`bq_gongshangbx_je`,
+`dw_gongshangbx_je`,
+`shengyubx_num`,
+`dw_shiyebx_js`,
+`dw_shiyebx_je`,
+`bq_je_display`,
+`gongshangbx_num`,
+`yanglaobx_num`,
+`bq_yanglaobx_je`,
+`dw_yiliaobx_js`,
+`currency`,
+`created_time`,
+`row_update_time`
+from
+db_qkgp.db_enterpriset_social_security
+where length(trim(nvl(`eid`,'')))>0 and length(trim(nvl(`report_year`,''))) > 0;

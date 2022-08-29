@@ -1,7 +1,7 @@
 -- 关联 db_sub_enterprisest_last_industry（企业最新行业信息表） 以及 db_codet_industry_code （行业代码配置表） 将企业行业属性维度退化至企业事实表中
 -- 因为行业信息的使用基本上都会关联到企业，无单独使用的其他场景
 
-CREATE TABLE IF NOT EXISTS dwd_enterprise
+CREATE TABLE IF NOT EXISTS dim_enterprise
     (
         `eid` STRING COMMENT '企业id'                      ,
         `id` bigint COMMENT '自增序号（非主键）'                  ,
@@ -56,8 +56,10 @@ AS ORC;
 
 
 
-with a as (select a.eid,b.industry_code,b.industry_name,b.series,b.industry_standard from db_sub_enterprisest_last_industry a left join b db_codet_industry_code on a.industry_code=b.industry_code where length(trim(nvl(a.eid,'')))>0 and length(trim(nvl(b.industry_code,'')))>0)
-insert overwrite table dwd_enterprise
+with a as (select a.eid,b.industry_code,b.industry_name,b.series,b.industry_standard from
+db_qkgp.db_sub_enterprisest_last_industry a left join dim_industry_code b on a.industry_code=b
+.industry_code where length(trim(nvl(a.eid,'')))>0 and length(trim(nvl(b.industry_code,'')))>0)
+insert overwrite table dim_enterprise
 select
 t.eid,
 id,
@@ -150,8 +152,9 @@ a.industry_name,
 a.series,
 a.industry_standard
 from
-db_enterpriset_enterprise t
+db_qkgp.db_enterpriset_enterprise t
 left join a
-on t.eid=b.eid
-where length(trim(nvl(eid,'')))>0 and `longitude`>-180 and `longitude`<180 and `gd_longitude`>-180 and `gd_longitude`<180
-and `latitude`>-90 and `latitude`<90 and `gd_latitude`>-90 and `gd_latitude`<90 and u_tags != '2';
+on t.eid=a.eid
+where length(trim(nvl(t.eid,'')))>0 and `longitude`>-180 and `longitude`<180 and `gd_longitude`>-180 and
+`gd_longitude`<180 and `latitude`>-90 and `latitude`<90 and `gd_latitude`>-90 and `gd_latitude`<90 and u_tags != '2';
+
