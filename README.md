@@ -28,7 +28,7 @@
 3. cloudera公司做过性能测试, 对于单任务，如果cpu大于等于5之后, cpu利用率反而不是很好（固定经验值），建议设置为4
 4. 综合memory+vcore计算，vcore=4，container=3（12/4）；内存分配：7.2/3=2.4 G
 5. 在yarn上运行程序时每个task都是在独立的Container中运行的
-6. 服务器物理核查看方式：cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l * grep 'core id' /proc/cpuinfo | sort -u | wc -l
+6. 服务器逻辑CPU个数查看：cat /proc/cpuinfo| grep "processor"| wc -l
 
 |参数| 调优                                        | 作用    |
 |---|-------------------------------------------|-------|
